@@ -20,7 +20,7 @@ publish:
       branch: master
 
 plugin:
-  name: NPM
+  name: Pypi
   desc: Publish a package to the Python package index.
   type: publish
   image: plugins/drone-pypi

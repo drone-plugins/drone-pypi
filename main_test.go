@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/drone/drone-plugin-go/drone"
+	"github.com/drone/drone-go/drone"
 )
 
 func TestDeploy(t *testing.T) {
