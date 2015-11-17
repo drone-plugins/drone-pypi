@@ -6,11 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/drone/drone-plugin-go/plugin"
+	"github.com/drone/drone-plugin-go/drone"
 )
 
 func TestDeploy(t *testing.T) {
-	w := plugin.Workspace{
+	w := drone.Workspace{
 		Path: os.Getenv("DRONE_PYPI_PATH"),
 	}
 	repository := os.Getenv("DRONE_PYPI_REPOSITORY")

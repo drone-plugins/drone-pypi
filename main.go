@@ -11,7 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/drone/drone-plugin-go/plugin"
+	"github.com/drone/drone-go/drone"
+	"github.com/drone/drone-go/plugin"
 )
 
 type Params struct {
@@ -22,7 +23,7 @@ type Params struct {
 }
 
 func main() {
-	w := plugin.Workspace{}
+	w := drone.Workspace{}
 	v := Params{}
 	plugin.Param("workspace", &w)
 	plugin.Param("vargs", &v)
@@ -34,7 +35,7 @@ func main() {
 	}
 }
 
-func deploy(w *plugin.Workspace, v *Params) error {
+func deploy(w *drone.Workspace, v *Params) error {
 	err := createConfig(v)
 	if err != nil {
 		return err
@@ -61,7 +62,7 @@ func createConfig(v *Params) error {
 	return nil
 }
 
-func uploadDist(w *plugin.Workspace, v *Params) error {
+func uploadDist(w *drone.Workspace, v *Params) error {
 	cmd, err := v.Upload()
 	if err != nil {
 		return err
