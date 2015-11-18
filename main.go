@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/drone/drone-go/drone"
@@ -63,15 +62,12 @@ func createConfig(v *Params) error {
 }
 
 func uploadDist(w *drone.Workspace, v *Params) error {
-	cmd, err := v.Upload()
-	if err != nil {
-		return err
-	}
+	cmd := v.Upload()
 	cmd.Dir = w.Path
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	fmt.Println("$", strings.Join(cmd.Args, " "))
-	err = cmd.Run()
+	err := cmd.Run()
 	if err != nil {
 		return err
 	}
@@ -105,34 +101,17 @@ password: %s
 }
 
 // Upload creates a setuptools upload command.
-func (v *Params) Upload() (*exec.Cmd, error) {
+func (v *Params) Upload() *exec.Cmd {
 	distributions := []string{"sdist"}
 	if len(v.Distributions) > 0 {
 		distributions = v.Distributions
 	}
-	args := []string{"python", "setup.py"}
+	args := []string{"setup.py"}
 	for i := range distributions {
 		args = append(args, distributions[i])
 	}
 	args = append(args, "upload")
 	args = append(args, "-r")
 	args = append(args, "pypi")
-	return command(args)
-}
-
-// Command builds a command using a variable length argument list.
-func command(args []string) (*exec.Cmd, error) {
-	name := args[0]
-	cmd := &exec.Cmd{
-		Path: name,
-		Args: args,
-	}
-	if filepath.Base(name) == name {
-		lp, err := exec.LookPath(name)
-		if err != nil {
-			return nil, err
-		}
-		cmd.Path = lp
-	}
-	return cmd, nil
+	return exec.Command("python", args...)
 }

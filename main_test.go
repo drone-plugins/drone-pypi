@@ -116,10 +116,7 @@ func TestUpload(t *testing.T) {
 	}
 	for i, data := range testdata {
 		v := Params{Distributions: data.distributions}
-		c, err := v.Upload()
-		if err != nil {
-			t.Error(err)
-		}
+		c := v.Upload()
 		if len(c.Args) != len(data.exp) {
 			t.Errorf("Case %d: Expected %d, got %d", i, len(data.exp), len(c.Args))
 		}
