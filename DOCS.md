@@ -8,7 +8,7 @@ Use the PyPI plugin to deploy a Python package to a PyPI server.
 The following is an example configuration for your .drone.yml:
 
 ```yaml
-deploy:
+publish:
   pypi:
     repository: https://pypi.python.org/pypi
     username: guido

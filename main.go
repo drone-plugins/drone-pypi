@@ -14,6 +14,7 @@ import (
 	"github.com/drone/drone-go/plugin"
 )
 
+// Params desribes how to upload a Python module to PyPI.
 type Params struct {
 	Distributions []string `json:"distributions"`
 	Password      *string  `json:"password,omitempty"`
@@ -28,25 +29,28 @@ func main() {
 	plugin.Param("vargs", &v)
 	plugin.MustParse()
 
-	err := deploy(&w, &v)
+	err := v.Deploy(&w)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func deploy(w *drone.Workspace, v *Params) error {
-	err := createConfig(v)
+// Deploy creates a PyPI configuration file and uploads a module.
+func (v *Params) Deploy(w *drone.Workspace) error {
+	err := v.CreateConfig()
 	if err != nil {
 		return err
 	}
-	err = uploadDist(w, v)
+	err = v.UploadDist(w)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func createConfig(v *Params) error {
+// CreateConfig creates a PyPI configuration file in the home directory of
+// the current user.
+func (v *Params) CreateConfig() error {
 	f, err := os.Create(path.Join(os.Getenv("HOME"), ".pypirc"))
 	if err != nil {
 		return err
@@ -61,7 +65,8 @@ func createConfig(v *Params) error {
 	return nil
 }
 
-func uploadDist(w *drone.Workspace, v *Params) error {
+// UploadDist executes a distutils command to upload a python module.
+func (v *Params) UploadDist(w *drone.Workspace) error {
 	cmd := v.Upload()
 	cmd.Dir = w.Path
 	cmd.Stdout = os.Stdout
@@ -100,7 +105,7 @@ password: %s
 	return err
 }
 
-// Upload creates a setuptools upload command.
+// Upload creates a distutils upload command.
 func (v *Params) Upload() *exec.Cmd {
 	distributions := []string{"sdist"}
 	if len(v.Distributions) > 0 {

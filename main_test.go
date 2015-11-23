@@ -9,10 +9,30 @@ import (
 	"github.com/drone/drone-go/drone"
 )
 
-func TestDeploy(t *testing.T) {
-	w := drone.Workspace{
-		Path: os.Getenv("DRONE_PYPI_PATH"),
-	}
+// TestPublish checks if this module can successfully publish a PyPI
+// package. A simple module is included in the `testdata` directory.
+//
+// To run this test against the PyPI test server:
+//
+// 1. register a new account (https://wiki.python.org/moin/TestPyPI)
+// 2. Export DRONE_PYPI_PATH, DRONE_PYPI_REPOSITORY, DRONE_PYPI_USERNAME,
+//    DRONE_PYPI_PASSWORD, and DRONE_PYPI_DISTRIBUTIONS
+// 3. Run the test suite
+//
+// For example:
+//
+//     $ export DRONE_PYPI_PATH=testdata
+//     $ export DRONE_PYPI_REPOSITORY=https://testpypi.python.org/pypi
+//     $ export DRONE_PYPI_USERNAME=drone_pypi_test
+//     $ export DRONE_PYPI_PASSWORD=$uper$ecretPassword
+//     $ export DRONE_PYPI_DISTRIBUTIONS=sdist
+//     $ go test -run TestPublish
+//
+// > NOTE: PyPI will refuse to upload the same version of a module twice,
+// > however setup.py still returns zero to the shell so this appears as a
+// > successful test.
+func TestPublish(t *testing.T) {
+	w := drone.Workspace{Path: os.Getenv("DRONE_PYPI_PATH")}
 	repository := os.Getenv("DRONE_PYPI_REPOSITORY")
 	username := os.Getenv("DRONE_PYPI_USERNAME")
 	password := os.Getenv("DRONE_PYPI_PASSWORD")
@@ -25,16 +45,13 @@ func TestDeploy(t *testing.T) {
 	if w.Path == "" {
 		t.Skip("DRONE_PYPI_PATH not set")
 	}
-	err := deploy(&w, &v)
+	err := v.Deploy(&w)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func sPtr(s string) *string {
-	return &s
-}
-
+// TestConfig checks if a PyPI configuration file can be generated.
 func TestConfig(t *testing.T) {
 	testdata := []struct {
 		repository *string
@@ -100,6 +117,8 @@ password: supersecret
 	}
 }
 
+// TestUpload checks if a distutils upload command can be properly
+// formatted.
 func TestUpload(t *testing.T) {
 	testdata := []struct {
 		distributions []string
@@ -126,4 +145,8 @@ func TestUpload(t *testing.T) {
 			}
 		}
 	}
+}
+
+func sPtr(s string) *string {
+	return &s
 }
