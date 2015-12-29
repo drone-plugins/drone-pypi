@@ -1,3 +1,6 @@
+[![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-pypi/status.svg)](http://beta.drone.io/drone-plugins/drone-pypi)
+[![Docker Pulls](https://img.shields.io/docker/pulls/plugins/drone-pypi.svg)](https://hub.docker.com/r/plugins/drone-pypi/)
+
 # drone-pypi
 
 Drone plugin for publishing to the Python package index
