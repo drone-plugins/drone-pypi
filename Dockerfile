@@ -7,7 +7,8 @@ RUN apk add -U \
  && rm -rf /var/cache/apk/* \
  && pip install --no-cache-dir --upgrade \
 	pip \
-	setuptools
+	setuptools \
+	wheel
 
 ADD drone-pypi /bin/
 
