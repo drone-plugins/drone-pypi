@@ -1,5 +1,8 @@
 # drone-pypi
 
+[![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-pypi/status.svg)](http://beta.drone.io/drone-plugins/drone-pypi)
+[![](https://badge.imagelayers.io/plugins/drone-pypi:latest.svg)](https://imagelayers.io/?images=plugins/drone-pypi:latest 'Get your own badge on imagelayers.io')
+
 Drone plugin for publishing to the Python package index
 
 ## Usage
