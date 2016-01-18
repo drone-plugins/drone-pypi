@@ -1,18 +1,17 @@
 build:
   image: golang:1.5
   environment:
-    - GO15VENDOREXPERIMENT=1
-    - GOOS=linux
-    - GOARCH=amd64
     - CGO_ENABLED=0
     - DRONE_PYPI_PATH=testdata
     - DRONE_PYPI_REPOSITORY=http://localhost:8000
     - DRONE_PYPI_DISTRIBUTIONS=sdist
   commands:
     - apt-get update && apt-get install -y python-setuptools
-    - go get
-    - go build
-    - go test -cover
+
+    - make deps
+    - make vet
+    - make build
+    - make test
 
 compose:
   simplepypi:
@@ -20,17 +19,29 @@ compose:
     pull: true
 
 publish:
+  coverage:
+    when:
+      branch: master
   docker:
-    username: drone
+    username: $$DOCKER_USER
     password: $$DOCKER_PASS
     email: $$DOCKER_EMAIL
     repo: plugins/drone-pypi
+    tag: latest
     when:
       branch: master
+  docker:
+    username: $$DOCKER_USER
+    password: $$DOCKER_PASS
+    email: $$DOCKER_EMAIL
+    repo: plugins/drone-pypi
+    tag: develop
+    when:
+      branch: develop
 
 plugin:
   name: Pypi
-  desc: Publish a package to the Python package index.
+  desc: Publish a Python package to a PyPI server
   type: publish
   image: plugins/drone-pypi
   labels:
