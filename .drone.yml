@@ -5,10 +5,19 @@ build:
     - GOOS=linux
     - GOARCH=amd64
     - CGO_ENABLED=0
+    - DRONE_PYPI_PATH=testdata
+    - DRONE_PYPI_REPOSITORY=http://localhost:8000
+    - DRONE_PYPI_DISTRIBUTIONS=sdist
   commands:
+    - apt-get update && apt-get install -y python-setuptools
     - go get
     - go build
-    - go test
+    - go test -cover
+
+compose:
+  simplepypi:
+    image: msteinert/simplepypi
+    pull: true
 
 publish:
   docker:
