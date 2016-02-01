@@ -9,6 +9,10 @@
     name = "Don Olmstead"
     email = "donny-dont@gmail.com"
     login = "donny-dont"
+  [people.gtaylor]
+    name = Greg Taylor
+    email = ""
+    login = "gtaylor"
   [people.jackspirou]
     name = "Jack Spirou"
     email = ""
@@ -28,4 +32,4 @@
 
 [org]
   [org.core]
-    people = ["bradrydzewski", "Bugagazavr", "donny-dont", "jackspirou", "msteinert", "nlf", "tboerger"]
+    people = ["bradrydzewski", "Bugagazavr", "donny-dont", "gtaylor", "jackspirou", "msteinert", "nlf", "tboerger"]
