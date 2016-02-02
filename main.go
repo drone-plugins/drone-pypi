@@ -22,7 +22,13 @@ type Params struct {
 	Username      *string  `json:"username,omitempty"`
 }
 
+var (
+	buildDate string
+)
+
 func main() {
+	fmt.Printf("Drone Pypi Plugin built at %s\n", buildDate)
+
 	w := drone.Workspace{}
 	v := Params{}
 	plugin.Param("workspace", &w)
