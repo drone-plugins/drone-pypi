@@ -147,6 +147,23 @@ func TestUpload(t *testing.T) {
 	}
 }
 
+
+// TestUploadTagged checks if a distutils upload command can be properly
+// formatted with egg_info tag.
+func TestUploadTagged(t *testing.T) {
+	v := Params{Tag: "1234"}
+	c := v.Upload()
+	exp := []string{"python", "setup.py", "egg_info", "-b", "1234", "sdist", "upload", "-r", "pypi"}
+	if len(c.Args) != len(exp) {
+		t.Errorf("Expected %d, got %d", len(exp), len(c.Args))
+	}
+	for i := range c.Args {
+		if c.Args[i] != exp[i] {
+			t.Errorf("Expected %s, got %s", strings.Join(exp, " "), strings.Join(c.Args, " "))
+		}
+	}
+}
+
 func sPtr(s string) *string {
 	return &s
 }

@@ -20,6 +20,7 @@ type Params struct {
 	Password      *string  `json:"password,omitempty"`
 	Repository    *string  `json:"repository,omitempty"`
 	Username      *string  `json:"username,omitempty"`
+	Tag      	  *string  `json:"tag,omitempty"`
 }
 
 func main() {
@@ -112,6 +113,9 @@ func (v *Params) Upload() *exec.Cmd {
 		distributions = v.Distributions
 	}
 	args := []string{"setup.py"}
+	if v.Tag != nil {
+		args = append(args, "egg_info", "-b", v.Tag)
+	}
 	for i := range distributions {
 		args = append(args, distributions[i])
 	}
