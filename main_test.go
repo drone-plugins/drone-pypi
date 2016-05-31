@@ -147,7 +147,6 @@ func TestUpload(t *testing.T) {
 	}
 }
 
-
 // TestUploadTagged checks if a distutils upload command can be properly
 // formatted with egg_info tag.
 func TestUploadTagged(t *testing.T) {

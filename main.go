@@ -20,7 +20,7 @@ type Params struct {
 	Password      *string  `json:"password,omitempty"`
 	Repository    *string  `json:"repository,omitempty"`
 	Username      *string  `json:"username,omitempty"`
-	Tag      	  *string  `json:"tag,omitempty"`
+	Tag           *string  `json:"tag,omitempty"`
 }
 
 func main() {
