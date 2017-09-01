@@ -13,59 +13,42 @@ Drone plugin for publishing to the Python package index
 Upload a source distribution to PyPI
 
 ```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"username": "guido",
-		"password": "secret"
-	}
-}
-EOF
-```
-
-Upload a source distribution and a wheel to PyPI
-
-```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"distributions": ["sdist", "bdist_wheel"],
-		"username": "guido",
-		"password": "secret"
-	}
-}
-EOF
+docker run --rm               \
+  -e PLUGIN_USERNAME=username \
+  -e PLUGIN_PASSWORD=password \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
+  plugins/pypi
 ```
 
 Upload a source distribution to a private PyPI server, e.g. [simplepypi][]
 
 ```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"repository": "https://pypi.example.com"
-	}
-}
-EOF
+docker run --rm                                  \
+  -e PLUGIN_USERNAME=username                    \
+  -e PLUGIN_PASSWORD=password                    \
+  -e PLUGIN_RESPOSITORY=https://pypi.example.com \
+  -v $(pwd):$(pwd)                               \
+  -w $(pwd)                                      \
+  plugins/pypi
 ```
 
 [simplepypi]: https://github.com/steiza/simplepypi
 
-## Docker
+## Build
 
-Build the Docker container using the `netgo` build tag to eliminate
-the CGO dependency:
+Build the binary with the following command:
 
 ```sh
-CGO_ENABLED=0 go build -a -tags netgo
-docker build --rm=true -t plugins/drone-pypi .
+go build
 ```
+
+## Docker
+  		  
+Build the Docker image with the following commands:
+  		  
+```
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -tags netgo -o release/linux/amd64/drone-pypi
+docker build --rm -t plugins/pypi .
+```
+
