@@ -1,7 +1,10 @@
 # drone-pypi
 
 [![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-pypi/status.svg)](http://beta.drone.io/drone-plugins/drone-pypi)
-[![](https://badge.imagelayers.io/plugins/drone-pypi:latest.svg)](https://imagelayers.io/?images=plugins/drone-pypi:latest 'Get your own badge on imagelayers.io')
+[![Join the chat at https://gitter.im/drone/drone](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/drone/drone)
+[![Go Doc](https://godoc.org/github.com/drone-plugins/drone-pypi?status.svg)](http://godoc.org/github.com/drone-plugins/drone-pypi)
+[![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-pypi)](https://goreportcard.com/report/github.com/drone-plugins/drone-pypi)
+[![](https://images.microbadger.com/badges/image/plugins/pypi.svg)](https://microbadger.com/images/plugins/pypi "Get your own image badge on microbadger.com")
 
 Drone plugin for publishing to the Python package index
 

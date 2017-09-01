@@ -1,38 +1,132 @@
-build:
-  image: golang:1.5
-  environment:
-    - GO15VENDOREXPERIMENT=1
-    - GOOS=linux
-    - GOARCH=amd64
-    - CGO_ENABLED=0
-    - DRONE_PYPI_PATH=testdata
-    - DRONE_PYPI_REPOSITORY=http://localhost:8000
-    - DRONE_PYPI_DISTRIBUTIONS=sdist
-  commands:
-    - apt-get update && apt-get install -y python-setuptools
-    - go get
-    - go build
-    - go test -cover
+workspace:
+  base: /go
+  path: src/github.com/drone-plugins/drone-pypi
 
-compose:
-  simplepypi:
-    image: msteinert/simplepypi
-    pull: true
+pipeline:
+  test:
+    image: golang:1.9
+    commands:
+      - go vet
+      - go test -cover -coverprofile=coverage.out
 
-publish:
-  docker:
-    username: drone
-    password: $$DOCKER_PASS
-    email: $$DOCKER_EMAIL
-    repo: plugins/drone-pypi
+  build_linux_amd64:
+    image: golang:1.9
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=amd64
+      - CGO_ENABLED=0
+    commands:
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi
+
+  build_linux_arm64:
+    image: golang:1.9
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=arm64
+      - CGO_ENABLED=0
+    commands:
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi
+
+  build_linux_arm:
+    image: golang:1.9
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=arm
+      - CGO_ENABLED=0
+      - GOARM=7
+    commands:
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-pypi
+
+  # build_windows_amd64:
+  #   image: golang:1.9-nanoserver
+  #   group: build
+  #   environment:
+  #     - GOOS=windows
+  #     - GOARCH=amd64
+  #     - CGO_ENABLED=0
+  #   commands:
+  #     - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/windows/amd64/drone-webhook
+
+  publish_linux_amd64:
+    image: plugins/docker
+    repo: plugins/pypi
+    tags: [ latest, 1.0.0, 1.0, 1 ]
+    secrets: [ docker_username, docker_password ]
+    dockerfile: Dockerfile
     when:
       branch: master
+      event: push
 
-plugin:
-  name: Pypi
-  desc: Publish a package to the Python package index.
-  type: publish
-  image: plugins/drone-pypi
-  labels:
-    - publish
-    - python
+  publish_linux_arm64:
+    image: plugins/docker
+    repo: plugins/pypi
+    tags: [ linux-arm64 ]
+    secrets: [ docker_username, docker_password ]
+    dockerfile: Dockerfile.arm64
+    when:
+      branch: master
+      event: push
+
+  publish_linux_arm:
+    image: plugins/docker
+    repo: plugins/pypi
+    tags: [ linux-arm ]
+    secrets: [ docker_username, docker_password ]
+    dockerfile: Dockerfile.arm
+    when:
+      branch: master
+      event: push
+
+  # publish_windows_amd64:
+  #   image: plugins/docker
+  #   repo: plugins/webhook
+  #   tags: [ windows-amd64 ]
+  #   secrets: [ docker_username, docker_password ]
+  #   dockerfile: Dockerfile.windows
+  #   when:
+  #     branch: master
+  #     event: push
+
+
+
+#build:
+#  image: golang:1.5
+#  environment:
+#    - GO15VENDOREXPERIMENT=1
+#    - GOOS=linux
+#    - GOARCH=amd64
+#    - CGO_ENABLED=0
+#    - DRONE_PYPI_PATH=testdata
+#    - DRONE_PYPI_REPOSITORY=http://localhost:8000
+#    - DRONE_PYPI_DISTRIBUTIONS=sdist
+#  commands:
+#    - apt-get update && apt-get install -y python-setuptools
+#    - go get
+#    - go build
+#    - go test -cover
+#
+#compose:
+#  simplepypi:
+#    image: msteinert/simplepypi
+#    pull: true
+#
+#publish:
+#  docker:
+#    username: drone
+#    password: $$DOCKER_PASS
+#    email: $$DOCKER_EMAIL
+#    repo: plugins/drone-pypi
+#    when:
+#      branch: master
+#
+#plugin:
+#  name: Pypi
+#  desc: Publish a package to the Python package index.
+#  type: publish
+#  image: plugins/drone-pypi
+#  labels:
+#    - publish
+#    - python
