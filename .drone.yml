@@ -21,28 +21,28 @@ pipeline:
     commands:
       - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi
 
-  build_linux_arm64:
-    image: golang:1.9
-    pull: true
-    group: build
-    environment:
-      - GOOS=linux
-      - GOARCH=arm64
-      - CGO_ENABLED=0
-    commands:
-      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi
-
-  build_linux_arm:
-    image: golang:1.9
-    pull: true
-    group: build
-    environment:
-      - GOOS=linux
-      - GOARCH=arm
-      - CGO_ENABLED=0
-      - GOARM=7
-    commands:
-      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-pypi
+#  build_linux_arm64:
+#    image: golang:1.9
+#    pull: true
+#    group: build
+#    environment:
+#      - GOOS=linux
+#      - GOARCH=arm64
+#      - CGO_ENABLED=0
+#    commands:
+#      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi
+#
+#  build_linux_arm:
+#    image: golang:1.9
+#    pull: true
+#    group: build
+#    environment:
+#      - GOOS=linux
+#      - GOARCH=arm
+#      - CGO_ENABLED=0
+#      - GOARM=7
+#    commands:
+#      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-pypi
 
   # build_windows_amd64:
   #   image: golang:1.9-nanoserver
@@ -66,27 +66,27 @@ pipeline:
       branch: master
       event: push
 
-  publish_linux_arm64:
-    image: plugins/docker
-    pull: true
-    repo: plugins/pypi
-    tags: [ linux-arm64 ]
-    secrets: [ docker_username, docker_password ]
-    dockerfile: Dockerfile.arm64
-    when:
-      branch: master
-      event: push
-
-  publish_linux_arm:
-    image: plugins/docker
-    pull: true
-    repo: plugins/pypi
-    tags: [ linux-arm ]
-    secrets: [ docker_username, docker_password ]
-    dockerfile: Dockerfile.arm
-    when:
-      branch: master
-      event: push
+#  publish_linux_arm64:
+#    image: plugins/docker
+#    pull: true
+#    repo: plugins/pypi
+#    tags: [ linux-arm64 ]
+#    secrets: [ docker_username, docker_password ]
+#    dockerfile: Dockerfile.arm64
+#    when:
+#      branch: master
+#      event: push
+#
+#  publish_linux_arm:
+#    image: plugins/docker
+#    pull: true
+#    repo: plugins/pypi
+#    tags: [ linux-arm ]
+#    secrets: [ docker_username, docker_password ]
+#    dockerfile: Dockerfile.arm
+#    when:
+#      branch: master
+#      event: push
 
   microbadger:
      image: plugins/pypi:1
