@@ -24,3 +24,6 @@ _testmain.go
 *.prof
 
 drone-pypi
+
+*.egg-info
+dist
