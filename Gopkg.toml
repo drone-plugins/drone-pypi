@@ -26,9 +26,5 @@
   version = "1.20.0"
 
 [[constraint]]
-  name = "github.com/drone/drone-go"
-  version = "0.8.4"
-
-[[constraint]]
   name = "github.com/joho/godotenv"
   version = "1.2.0"
