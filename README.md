@@ -1,68 +1,28 @@
 # drone-pypi
 
 [![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-pypi/status.svg)](http://beta.drone.io/drone-plugins/drone-pypi)
-[![](https://badge.imagelayers.io/plugins/drone-pypi:latest.svg)](https://imagelayers.io/?images=plugins/drone-pypi:latest 'Get your own badge on imagelayers.io')
+[![Join the discussion at https://discourse.drone.io](https://img.shields.io/badge/discourse-forum-orange.svg)](https://discourse.drone.io)
+[![Go Report Card](https://goreportcard.com/badge/github.com/drone-plugins/drone-pypi)](https://goreportcard.com/report/github.com/drone-plugins/drone-pypi)
 
-Drone plugin for publishing to the Python package index
+Basic Drone Plugin for PyPi publishes. The plugin use twine to upload packages.
+
+## Build
+
+Build the binary with the following commands:
+
+```shell
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -tags netgo -o release/linux/amd64/drone-pypi
+docker build --rm -t plugins/drone-pypi .
+```
 
 ## Usage
 
-Upload a source distribution to PyPI
-
-```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"username": "guido",
-		"password": "secret"
-	}
-}
-EOF
-```
-
-Upload a source distribution and a wheel to PyPI
-
-```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"distributions": ["sdist", "bdist_wheel"],
-		"username": "guido",
-		"password": "secret"
-	}
-}
-EOF
-```
-
-Upload a source distribution to a private PyPI server, e.g. [simplepypi][]
-
-```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"repository": "https://pypi.example.com"
-	}
-}
-EOF
-```
-
-[simplepypi]: https://github.com/steiza/simplepypi
-
-## Docker
-
-Build the Docker container using the `netgo` build tag to eliminate
-the CGO dependency:
-
-```sh
-CGO_ENABLED=0 go build -a -tags netgo
-docker build --rm=true -t plugins/drone-pypi .
+```shell
+docker run --rm \
+  -e PLUGIN_USERNAME=jdoe \
+  -e PLUGIN_PASSWORD=my_secret \
+  -e PLUGIN_SKIP_BUILD=false \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
+  plugins/drone-pypi
 ```

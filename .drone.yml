@@ -1,38 +1,60 @@
-build:
-  image: golang:1.5
-  environment:
-    - GO15VENDOREXPERIMENT=1
-    - GOOS=linux
-    - GOARCH=amd64
-    - CGO_ENABLED=0
-    - DRONE_PYPI_PATH=testdata
-    - DRONE_PYPI_REPOSITORY=http://localhost:8000
-    - DRONE_PYPI_DISTRIBUTIONS=sdist
-  commands:
-    - apt-get update && apt-get install -y python-setuptools
-    - go get
-    - go build
-    - go test -cover
+workspace:
+  base: /go
+  path: src/github.com/drone-plugins/drone-pypi
 
-compose:
-  simplepypi:
-    image: msteinert/simplepypi
+pipeline:
+  test:
+    image: golang:1.10
     pull: true
+    commands:
+      - go vet ./...
+      - go test -cover ./...
+      - rm -rf dist
+      - rm -rf drone_pypi_test.egg-info
+  environment:
+    - PLUGIN_REPOSITORY=https://test.pypi.org/legacy/
+    - PLUGIN_DISTRIBUTIONS=sdist
 
-publish:
-  docker:
-    username: drone
-    password: $$DOCKER_PASS
-    email: $$DOCKER_EMAIL
-    repo: plugins/drone-pypi
+  build_linux_amd64:
+    image: golang:1.10
+    pull: true
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=amd64
+      - CGO_ENABLED=0
+    commands:
+      - |
+        if test "${DRONE_TAG}" = ""; then
+          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi
+        else
+          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi
+        fi
+
+  publish_linux_amd64:
+    image: plugins/docker:17.12
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: docker
+    repo: plugins/pypi
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
+    dockerfile: Dockerfile
     when:
-      branch: master
+      event: [ push, tag ]
 
-plugin:
-  name: Pypi
-  desc: Publish a package to the Python package index.
-  type: publish
-  image: plugins/drone-pypi
-  labels:
-    - publish
-    - python
+  manifests:
+    image: plugins/manifest:1
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    spec: manifest.tmpl
+    auto_tag: true
+    ignore_missing: true
+    when:
+      event: [ push, tag ]
+
+  microbadger:
+    image: plugins/webhook:1
+    pull: true
+    secrets: [ webhook_url ]
+    when:
