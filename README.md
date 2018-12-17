@@ -4,7 +4,7 @@
 [![Join the discussion at https://discourse.drone.io](https://img.shields.io/badge/discourse-forum-orange.svg)](https://discourse.drone.io)
 [![Go Report Card](https://goreportcard.com/badge/github.com/drone-plugins/drone-pypi)](https://goreportcard.com/report/github.com/drone-plugins/drone-pypi)
 
-Basic Drone Plugin for PyPi publishes. The plugin use twine to upload packages.
+Basic Drone Plugin for PyPi publishes with [twine](https://pypi.org/project/twine/).
 
 ## Build
 
