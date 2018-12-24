@@ -3,14 +3,6 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "KvKeVZyH3n15SKlm6UmPwPqz0rY=",
-			"path": "github.com/codegangsta/cli",
-			"revision": "cfb38830724cc34fedffe9a2a29fb54fa9169cd1",
-			"revisionTime": "2017-08-11T01:42:03Z",
-			"version": "v1",
-			"versionExact": "v1.20.0"
-		},
-		{
 			"checksumSHA1": "I+g5iffd0bNDiI8swxzsHiJxBz0=",
 			"path": "github.com/joho/godotenv",
 			"revision": "c0b86d615e06d6fa5f869364d68f774ba49a86e3",
@@ -31,7 +23,15 @@
 			"revisionTime": "2018-10-23T23:59:46Z",
 			"version": "v0.8",
 			"versionExact": "v0.8.0"
+		},
+		{
+			"checksumSHA1": "wHJK2MbuCCBwndMy6qzRMCDuQ1E=",
+			"path": "github.com/urfave/cli",
+			"revision": "cfb38830724cc34fedffe9a2a29fb54fa9169cd1",
+			"revisionTime": "2017-08-11T01:42:03Z",
+			"version": "v1.20.0",
+			"versionExact": "v1.20.0"
 		}
 	],
-	"rootPath": "drone-pypi-1"
+	"rootPath": "plugin-pypi"
 }

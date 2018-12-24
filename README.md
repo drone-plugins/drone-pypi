@@ -24,5 +24,5 @@ docker run --rm \
   -e PLUGIN_SKIP_BUILD=false \
   -v $(pwd):$(pwd) \
   -w $(pwd) \
-  plugins/drone-pypi
+  plugins/pypi
 ```

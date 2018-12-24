@@ -1,20 +1,13 @@
-FROM alpine:3.2
+FROM alpine:3.8
 
-ARG GITSHA="VCS ref not found"
-ARG BUILDDATE="Build date not found"
-LABEL org.label-schema.url="https://github.com/drone-plugins/drone-pypi" \
-      org.label-schema.name="Drone-Pypi" \
-      org.label-schema.license="Apache-2.0" \
-      org.label-schema.vcs-url="https://github.com/drone-plugins/drone-pypi" \
-      org.label-schema.schema-version="1.0" \
-      org.label-schema.description="Simple Drone CI plugin written for and tested on version 0.8+ to publish pypi packages" \
-      org.label-schema.vcs-ref=$GITSHA \
-      org.label-schema.build-date=$BUILDDATE
+LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" \
+  org.label-schema.name="Drone Codecov" \
+  org.label-schema.vendor="Drone.IO Community" \
+  org.label-schema.schema-version="1.0"
 
-RUN apk add -U ca-certificates python3 \
- && rm -rf /var/cache/apk/* \
- && pip3 install --no-cache-dir --upgrade pip \
- && pip3 install --no-cache-dir --upgrade twine pip setuptools wheel six
+RUN apk add -U ca-certificates python3 && \
+    rm -rf /var/cache/apk/* && \
+    pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
 
 ADD release/linux/amd64/drone-pypi /bin/
 ENTRYPOINT ["/bin/drone-pypi"]
