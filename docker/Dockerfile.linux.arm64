@@ -9,5 +9,5 @@ RUN apk add -U ca-certificates python3 && \
     rm -rf /var/cache/apk/* && \
     pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
 
-ADD release/linux/amd64/drone-pypi /bin/
+ADD release/linux/arm64/drone-pypi /bin/
 ENTRYPOINT ["/bin/drone-pypi"]
