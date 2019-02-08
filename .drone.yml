@@ -17,8 +17,10 @@ steps:
 
 - name: test
   pull: always
-  image: golang:1.11
+  image: golang:1.11-alpine
   commands:
+  - apk --no-cache add -U python3 git
+  - pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
   - go test -cover ./...
   environment:
     GO111MODULE: on
@@ -31,6 +33,15 @@ services:
 - name: pypiserver
   pull: always
   image: pypiserver/pypiserver
+  entrypoint:
+  - pypi-server
+  - -P
+  - .
+  - -a
+  - .
+  - -p
+  - 8080
+  - /data/packages
 
 trigger:
   branch:

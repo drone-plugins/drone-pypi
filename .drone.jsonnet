@@ -10,6 +10,16 @@ local PipelineTesting = {
           name: "pypiserver",
           image: "pypiserver/pypiserver",
           pull: "always",
+          entrypoint: [
+              "pypi-server",
+              "-P",
+              ".",
+              "-a",
+              ".",
+              "-p",
+              "8080",
+              "/data/packages"
+          ],
       },
   ],
   steps: [
@@ -26,7 +36,7 @@ local PipelineTesting = {
     },
     {
       name: "test",
-      image: "golang:1.11",
+      image: "golang:1.11-alpine",
       pull: "always",
       environment: {
         GO111MODULE: "on",
@@ -36,6 +46,8 @@ local PipelineTesting = {
         PLUGIN_PASSWORD: "demo",
       },
       commands: [
+        "apk --no-cache add -U python3 git",
+        "pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine",
         "go test -cover ./...",
       ],
     },
