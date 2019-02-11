@@ -1,7 +1,7 @@
 repository:
-  name: drone-ansible
-  description: Drone plugin to provision via Ansible
-  homepage: http://plugins.drone.io/drone-plugins/drone-ansible
+  name: drone-pypi
+  description: Drone plugin to publish python packages to PyPi
+  homepage: http://plugins.drone.io/drone-plugins/drone-pypi
   topics: drone, drone-plugin
 
   private: false
