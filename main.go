@@ -1,122 +1,74 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"io"
-	"log"
 	"os"
-	"os/exec"
-	"path"
-	"strings"
 
-	"github.com/drone/drone-go/drone"
-	"github.com/drone/drone-go/plugin"
+	"github.com/urfave/cli"
+	_ "github.com/joho/godotenv/autoload"
 )
 
-// Params desribes how to upload a Python module to PyPI.
-type Params struct {
-	Distributions []string `json:"distributions"`
-	Password      *string  `json:"password,omitempty"`
-	Repository    *string  `json:"repository,omitempty"`
-	Username      *string  `json:"username,omitempty"`
-}
+var build = "0" // build number set at compile-time
 
 func main() {
-	w := drone.Workspace{}
-	v := Params{}
-	plugin.Param("workspace", &w)
-	plugin.Param("vargs", &v)
-	plugin.MustParse()
+	app := cli.NewApp()
+	app.Name = "pypi plugin"
+	app.Usage = "pypi publish plugin"
+	app.Action = run
+	app.Version = fmt.Sprintf("0.0.%s", build)
+	app.Flags = []cli.Flag{
 
-	err := v.Deploy(&w)
-	if err != nil {
-		log.Fatal(err)
+		cli.StringFlag{
+			Name:   "repository",
+			Usage:  "pypi repository URL",
+			Value:  "https://upload.pypi.org/legacy/",
+			EnvVar: "PLUGIN_REPOSITORY",
+		},
+		cli.StringFlag{
+			Name:   "username",
+			Usage:  "pypi username",
+			Value:  "guido",
+			EnvVar: "PLUGIN_USERNAME,PYPI_USERNAME",
+		},
+		cli.StringFlag{
+			Name:   "password",
+			Usage:  "pypi password",
+			Value:  "secret",
+			EnvVar: "PLUGIN_PASSWORD,PYPI_PASSWORD",
+		},
+		cli.StringFlag{
+			Name:   "setupfile",
+			Usage:  "relative location of setup.py file",
+			Value:  "setup.py",
+			EnvVar: "PLUGIN_SETUPFILE",
+		},
+		cli.StringSliceFlag{
+			Name:   "distributions",
+			Usage:  "distribution types to deploy",
+			EnvVar: "PLUGIN_DISTRIBUTIONS",
+		},
+		cli.BoolTFlag{
+			Name:   "skip_build",
+			Usage:  "skip build and only upload pre-build packages",
+			EnvVar: "PLUGIN_SKIP_BUILD",
+		},
 	}
+
+	app.Run(os.Args)
 }
 
-// Deploy creates a PyPI configuration file and uploads a module.
-func (v *Params) Deploy(w *drone.Workspace) error {
-	err := v.CreateConfig()
-	if err != nil {
-		return err
+func run(c *cli.Context) {
+	plugin := Plugin{
+		Repository:    c.String("repository"),
+		Username:      c.String("username"),
+		Password:      c.String("password"),
+		SetupFile:     c.String("setupfile"),
+		Distributions: c.StringSlice("distributions"),
+		SkipBuild:     c.Bool("skip_build"),
 	}
-	err = v.UploadDist(w)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
-// CreateConfig creates a PyPI configuration file in the home directory of
-// the current user.
-func (v *Params) CreateConfig() error {
-	f, err := os.Create(path.Join(os.Getenv("HOME"), ".pypirc"))
-	if err != nil {
-		return err
+	if err := plugin.Exec(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	defer f.Close()
-	buf := bufio.NewWriter(f)
-	err = v.WriteConfig(buf)
-	if err != nil {
-		return err
-	}
-	buf.Flush()
-	return nil
-}
-
-// UploadDist executes a distutils command to upload a python module.
-func (v *Params) UploadDist(w *drone.Workspace) error {
-	cmd := v.Upload()
-	cmd.Dir = w.Path
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	fmt.Println("$", strings.Join(cmd.Args, " "))
-	err := cmd.Run()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// WriteConfig writes a .pypirc to a supplied io.Writer.
-func (v *Params) WriteConfig(w io.Writer) error {
-	repository := "https://pypi.python.org/pypi"
-	if v.Repository != nil {
-		repository = *v.Repository
-	}
-	username := "guido"
-	if v.Username != nil {
-		username = *v.Username
-	}
-	password := "secret"
-	if v.Password != nil {
-		password = *v.Password
-	}
-	_, err := io.WriteString(w, fmt.Sprintf(`[distutils]
-index-servers =
-    pypi
-
-[pypi]
-repository: %s
-username: %s
-password: %s
-`, repository, username, password))
-	return err
-}
-
-// Upload creates a distutils upload command.
-func (v *Params) Upload() *exec.Cmd {
-	distributions := []string{"sdist"}
-	if len(v.Distributions) > 0 {
-		distributions = v.Distributions
-	}
-	args := []string{"setup.py"}
-	for i := range distributions {
-		args = append(args, distributions[i])
-	}
-	args = append(args, "upload")
-	args = append(args, "-r")
-	args = append(args, "pypi")
-	return exec.Command("python", args...)
 }

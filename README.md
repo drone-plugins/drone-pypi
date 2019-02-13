@@ -1,68 +1,47 @@
 # drone-pypi
 
-[![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-pypi/status.svg)](http://beta.drone.io/drone-plugins/drone-pypi)
-[![](https://badge.imagelayers.io/plugins/drone-pypi:latest.svg)](https://imagelayers.io/?images=plugins/drone-pypi:latest 'Get your own badge on imagelayers.io')
+[![Build Status](http://cloud.drone.io/api/badges/drone-plugins/drone-pypi/status.svg)](http://cloud.drone.io/drone-plugins/drone-pypi)
+[![Gitter chat](https://badges.gitter.im/drone/drone.png)](https://gitter.im/drone/drone)
+[![Join the discussion at https://discourse.drone.io](https://img.shields.io/badge/discourse-forum-orange.svg)](https://discourse.drone.io)
+[![Drone questions at https://stackoverflow.com](https://img.shields.io/badge/drone-stackoverflow-orange.svg)](https://stackoverflow.com/questions/tagged/drone.io)
+[![](https://images.microbadger.com/badges/image/plugins/pypi.svg)](https://microbadger.com/images/plugins/pypi "Get your own image badge on microbadger.com")
+[![Go Doc](https://godoc.org/github.com/drone-plugins/drone-pypi?status.svg)](http://godoc.org/github.com/drone-plugins/drone-pypi)
+[![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-pypi)](https://goreportcard.com/report/github.com/drone-plugins/drone-pypi)
 
-Drone plugin for publishing to the Python package index
+Drone Plugin for PyPi publishing with [twine](https://pypi.org/project/twine/). For the usage information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/drone-plugins/drone-pypi/).
 
-## Usage
+## Build
 
-Upload a source distribution to PyPI
+Build the binary with the following commands:
 
-```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"username": "guido",
-		"password": "secret"
-	}
-}
-EOF
+```Shell
+export GOOS=linux
+export GOARCH=amd64
+export CGO_ENABLED=0
+export GO111MODULE=on
+
+go build -v -a -tags netgo -o release/linux/amd64/drone-pypi
 ```
-
-Upload a source distribution and a wheel to PyPI
-
-```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"distributions": ["sdist", "bdist_wheel"],
-		"username": "guido",
-		"password": "secret"
-	}
-}
-EOF
-```
-
-Upload a source distribution to a private PyPI server, e.g. [simplepypi][]
-
-```sh
-./drone-pypi <<EOF
-{
-	"workspace": {
-		"path": "/drone/my-module-py"
-	}
-	"vargs": {
-		"repository": "https://pypi.example.com"
-	}
-}
-EOF
-```
-
-[simplepypi]: https://github.com/steiza/simplepypi
 
 ## Docker
 
-Build the Docker container using the `netgo` build tag to eliminate
-the CGO dependency:
+Build the Docker image with the following commands:
 
-```sh
-CGO_ENABLED=0 go build -a -tags netgo
-docker build --rm=true -t plugins/drone-pypi .
+```Shell
+docker build \
+  --label org.label-schema.build-date=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --label org.label-schema.vcs-ref=$(git rev-parse --short HEAD) \
+  --file docker/Dockerfile.linux.amd64 --tag plugins/pypi .
+```
+
+## Usage
+
+```Shell
+docker run --rm \
+  -e PLUGIN_USERNAME=jdoe \
+  -e PLUGIN_PASSWORD=my_secret \
+  -e PLUGIN_SKIP_BUILD=false \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
+  plugins/pypi
 ```
