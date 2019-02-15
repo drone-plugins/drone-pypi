@@ -8,13 +8,13 @@
 [![Go Doc](https://godoc.org/github.com/drone-plugins/drone-pypi?status.svg)](http://godoc.org/github.com/drone-plugins/drone-pypi)
 [![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-pypi)](https://goreportcard.com/report/github.com/drone-plugins/drone-pypi)
 
-Drone Plugin for PyPi publishing with [twine](https://pypi.org/project/twine/). For the usage information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/drone-plugins/drone-pypi/).
+Drone plugin to publish PyPi with [Twine](https://pypi.org/project/twine/). For the usage information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/drone-plugins/drone-pypi/).
 
 ## Build
 
-Build the binary with the following commands:
+Build the binary with the following command:
 
-```Shell
+```console
 export GOOS=linux
 export GOARCH=amd64
 export CGO_ENABLED=0
@@ -25,9 +25,9 @@ go build -v -a -tags netgo -o release/linux/amd64/drone-pypi
 
 ## Docker
 
-Build the Docker image with the following commands:
+Build the Docker image with the following command:
 
-```Shell
+```console
 docker build \
   --label org.label-schema.build-date=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   --label org.label-schema.vcs-ref=$(git rev-parse --short HEAD) \
@@ -36,7 +36,7 @@ docker build \
 
 ## Usage
 
-```Shell
+```console
 docker run --rm \
   -e PLUGIN_USERNAME=jdoe \
   -e PLUGIN_PASSWORD=my_secret \
