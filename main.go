@@ -47,7 +47,7 @@ func main() {
 			Usage:  "distribution types to deploy",
 			EnvVar: "PLUGIN_DISTRIBUTIONS",
 		},
-		cli.BoolTFlag{
+		cli.BoolFlag{
 			Name:   "skip_build",
 			Usage:  "skip build and only upload pre-build packages",
 			EnvVar: "PLUGIN_SKIP_BUILD",
