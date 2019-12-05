@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -46,7 +48,27 @@ func (p Plugin) uploadCommand() *exec.Cmd {
 }
 
 // Exec runs the plugin - doing the necessary setup.py modifications
-func (p Plugin) Exec() error {
+func (p *Plugin) Exec() error {
+	// If a setup.py is in a subdirectory, we need to change to that directory first
+	// so the correct files are packaged.
+	pathParts := strings.Split(p.SetupFile, string(os.PathSeparator))
+	if len(pathParts) > 1 {
+		pathParts := pathParts[0 : len(pathParts)-1]
+		packageDir := strings.Join(pathParts, string(os.PathSeparator))
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		defer os.Chdir(cwd)
+		err = os.Chdir(packageDir)
+		if err != nil {
+			return errors.Wrap(err, "Failed to chdir to "+packageDir)
+		}
+		// Now change the setup file value as well, since it's relative and we're in
+		// the correct place.
+		p.SetupFile = "setup.py"
+	}
+
 	if !p.SkipBuild {
 		out, err := p.buildCommand().CombinedOutput()
 		if err != nil {
