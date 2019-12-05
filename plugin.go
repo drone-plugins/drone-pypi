@@ -23,7 +23,15 @@ func (p Plugin) buildCommand() *exec.Cmd {
 	// Set the default of distributions in here
 	// as CLI package still has issues with string slice defaults
 	distributions := []string{"sdist"}
-	if len(p.Distributions) > 0 {
+	// Sanitize bad dist values
+	inputDists := make([]string, 0, len(p.Distributions))
+	for _, dist := range p.Distributions {
+		if strings.TrimSpace(dist) == "" {
+			continue
+		}
+		inputDists = append(inputDists, dist)
+	}
+	if len(inputDists) > 0 {
 		distributions = p.Distributions
 	}
 	args := []string{p.SetupFile}
