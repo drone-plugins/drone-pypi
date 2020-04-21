@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 )
@@ -40,7 +41,7 @@ func (p Plugin) uploadCommand() *exec.Cmd {
 	args = append(args, p.Username)
 	args = append(args, "--password")
 	args = append(args, p.Password)
-	args = append(args, "dist/*")
+	args = append(args, filepath.Join(filepath.Dir(p.SetupFile), "dist/*"))
 
 	return exec.Command("twine", args...)
 }
