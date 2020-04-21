@@ -52,6 +52,12 @@ func main() {
 			Usage:  "skip build and only upload pre-build packages",
 			EnvVar: "PLUGIN_SKIP_BUILD",
 		},
+		cli.StringFlag{
+			Name:	"dist_dir",
+			Usage:  "used when distribution directory is not in build root",
+			Value:  "dist/",
+			EnvVar: "PLUGIN_DIST_DIR",
+		},
 	}
 
 	app.Run(os.Args)
@@ -65,6 +71,7 @@ func run(c *cli.Context) {
 		SetupFile:     c.String("setupfile"),
 		Distributions: c.StringSlice("distributions"),
 		SkipBuild:     c.Bool("skip_build"),
+		DistDir:       c.String("dist_dir"),
 	}
 
 	if err := plugin.Exec(); err != nil {

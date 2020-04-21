@@ -16,6 +16,7 @@ type Plugin struct {
 	SetupFile     string
 	Distributions []string
 	SkipBuild     bool
+	DistDir       string
 }
 
 func (p Plugin) buildCommand() *exec.Cmd {
@@ -41,7 +42,7 @@ func (p Plugin) uploadCommand() *exec.Cmd {
 	args = append(args, p.Username)
 	args = append(args, "--password")
 	args = append(args, p.Password)
-	args = append(args, filepath.Join(filepath.Dir(p.SetupFile), "dist/*"))
+	args = append(args, filepath.Join(filepath.Dir(p.DistDir), "/*"))
 
 	return exec.Command("twine", args...)
 }
