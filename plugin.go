@@ -42,7 +42,7 @@ func (p Plugin) uploadCommand() *exec.Cmd {
 	args = append(args, p.Username)
 	args = append(args, "--password")
 	args = append(args, p.Password)
-	args = append(args, filepath.Join(filepath.Dir(p.DistDir), "/*"))
+	args = append(args, filepath.Join(p.DistDir, "/*"))
 
 	return exec.Command("twine", args...)
 }
