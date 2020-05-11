@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 )
@@ -15,6 +16,7 @@ type Plugin struct {
 	SetupFile     string
 	Distributions []string
 	SkipBuild     bool
+	DistDir       string
 }
 
 func (p Plugin) buildCommand() *exec.Cmd {
@@ -40,7 +42,7 @@ func (p Plugin) uploadCommand() *exec.Cmd {
 	args = append(args, p.Username)
 	args = append(args, "--password")
 	args = append(args, p.Password)
-	args = append(args, "dist/*")
+	args = append(args, filepath.Join(p.DistDir, "/*"))
 
 	return exec.Command("twine", args...)
 }

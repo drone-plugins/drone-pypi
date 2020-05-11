@@ -17,6 +17,7 @@ func TestPublish(t *testing.T) {
 		SetupFile:     "testdata/setup.py",
 		Distributions: strings.Split(os.Getenv("PLUGIN_DISTRIBUTIONS"), " "),
 		SkipBuild:     false,
+		DistDir:       "dist/",
 	}
 	err := plugin.Exec()
 	if err != nil {
