@@ -9,7 +9,7 @@ platform:
 steps:
 - name: vet
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - go vet ./...
   environment:
@@ -17,7 +17,7 @@ steps:
 
 - name: test
   pull: always
-  image: golang:1.11-alpine
+  image: golang:1.16-alpine
   commands:
   - apk --no-cache add -U python3 python3-dev git gcc libc-dev libffi-dev openssl-dev
   - pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
@@ -58,7 +58,7 @@ platform:
 steps:
 - name: build-push
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-pypi"
   environment:
@@ -71,7 +71,7 @@ steps:
 
 - name: build-tag
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-pypi"
   environment:
@@ -83,7 +83,7 @@ steps:
 
 - name: executable
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - ./release/linux/amd64/drone-pypi --help
 
@@ -138,7 +138,7 @@ platform:
 steps:
 - name: build-push
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-pypi"
   environment:
@@ -151,7 +151,7 @@ steps:
 
 - name: build-tag
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-pypi"
   environment:
@@ -163,7 +163,7 @@ steps:
 
 - name: executable
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - ./release/linux/arm64/drone-pypi --help
 
@@ -218,7 +218,7 @@ platform:
 steps:
 - name: build-push
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-pypi"
   environment:
@@ -231,7 +231,7 @@ steps:
 
 - name: build-tag
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-pypi"
   environment:
@@ -243,7 +243,7 @@ steps:
 
 - name: executable
   pull: always
-  image: golang:1.11
+  image: golang:1.16
   commands:
   - ./release/linux/arm/drone-pypi --help
 
