@@ -19,8 +19,9 @@ steps:
   pull: always
   image: golang:1.11-alpine
   commands:
-  - apk --no-cache add -U python3 python3-dev git gcc libc-dev libffi-dev openssl-dev
-  - pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
+  - apk --no-cache add -U python3 python3-dev git gcc libc-dev libffi-dev openssl-dev curl
+  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh /dev/stdin -y -q --profile minimal
+  - PATH=$PATH:~/.cargo/bin pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
   - go test -cover ./...
   environment:
     GO111MODULE: on
@@ -60,7 +61,7 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-pypi"
+  - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -73,7 +74,7 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-pypi"
+  - go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -140,7 +141,7 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-pypi"
+  - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -153,7 +154,7 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-pypi"
+  - go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -220,7 +221,7 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-pypi"
+  - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-pypi
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
@@ -233,7 +234,7 @@ steps:
   pull: always
   image: golang:1.11
   commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-pypi"
+  - go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-pypi
   environment:
     CGO_ENABLED: 0
     GO111MODULE: on
