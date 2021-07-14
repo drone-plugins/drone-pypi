@@ -46,8 +46,10 @@ local PipelineTesting = {
         PLUGIN_PASSWORD: "demo",
       },
       commands: [
-        "apk --no-cache add -U python3 git",
-        "pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine",
+        "apk --no-cache add -U python3 python3-dev git gcc libc-dev libffi-dev openssl-dev curl",
+        // install rust to compile cryptography for twine
+        "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh /dev/stdin -y -q --profile minimal",
+        "PATH=$PATH:~/.cargo/bin pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine",
         "go test -cover ./...",
       ],
     },
