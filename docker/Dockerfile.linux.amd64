@@ -6,9 +6,12 @@ LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" \
   org.label-schema.schema-version="1.0"
 
 RUN apk add -U ca-certificates python3 \
-    python3-dev gcc libc-dev libffi-dev openssl-dev git && \
+    python3-dev gcc libc-dev libffi-dev openssl-dev git curl && \
     rm -rf /var/cache/apk/* && \
-    pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
+    python3 -m ensurepip && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh /dev/stdin -y -q --profile minimal && \
+    env PATH=$PATH:$HOME/.cargo/bin pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine  && \
+    rm -rf $HOME/.cargo/ $HOME/.rustup
 
 ADD release/linux/amd64/drone-pypi /bin/
 ENTRYPOINT ["/bin/drone-pypi"]

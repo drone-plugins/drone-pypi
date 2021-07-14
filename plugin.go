@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os/exec"
+	"path"
 	"path/filepath"
 
 	"github.com/pkg/errors"
@@ -26,11 +27,14 @@ func (p Plugin) buildCommand() *exec.Cmd {
 	if len(p.Distributions) > 0 {
 		distributions = p.Distributions
 	}
-	args := []string{p.SetupFile}
+	dirToWork := path.Dir(p.SetupFile)
+	args := []string{"setup.py"}
 	for i := range distributions {
 		args = append(args, distributions[i])
 	}
-	return exec.Command("python3", args...)
+	cmd := exec.Command("python3", args...)
+	cmd.Dir = dirToWork
+	return cmd
 }
 
 func (p Plugin) uploadCommand() *exec.Cmd {
@@ -44,7 +48,9 @@ func (p Plugin) uploadCommand() *exec.Cmd {
 	args = append(args, p.Password)
 	args = append(args, filepath.Join(p.DistDir, "/*"))
 
-	return exec.Command("twine", args...)
+    cmd := exec.Command("twine", args...)
+    cmd.Dir = path.Dir(p.SetupFile)
+	return cmd
 }
 
 // Exec runs the plugin - doing the necessary setup.py modifications

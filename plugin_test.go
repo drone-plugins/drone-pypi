@@ -34,11 +34,11 @@ func TestUpload(t *testing.T) {
 	}{
 		{
 			[]string{},
-			[]string{"python3", "testdata/setup.py", "sdist"},
+			[]string{"python3", "setup.py", "sdist"},
 		},
 		{
 			[]string{"sdist", "bdist_wheel"},
-			[]string{"python3", "testdata/setup.py", "sdist", "bdist_wheel"},
+			[]string{"python3", "setup.py", "sdist", "bdist_wheel"},
 		},
 	}
 	for i, data := range testdata {
