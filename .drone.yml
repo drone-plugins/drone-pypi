@@ -19,7 +19,7 @@ steps:
   pull: always
   image: golang:1.18-alpine
   commands:
-  - apk --no-cache add -U python3 -m ensurepip python3-dev git gcc libc-dev libffi-dev openssl-dev rust cargo
+  - apk --no-cache add -U python3 py3-pip python3-dev git gcc libc-dev libffi-dev openssl-dev rust cargo
   - pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
   - go test -cover ./...
   environment:
