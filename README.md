@@ -8,7 +8,7 @@
 [![Go Doc](https://godoc.org/github.com/drone-plugins/drone-pypi?status.svg)](http://godoc.org/github.com/drone-plugins/drone-pypi)
 [![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-pypi)](https://goreportcard.com/report/github.com/drone-plugins/drone-pypi)
 
-Drone Plugin for PyPi publishing with [twine](https://pypi.org/project/twine/). For the usage information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/drone-plugins/drone-pypi/).
+Drone Plugin for PyPi publishing with [twine](https://pypi.org/project/twine/). For the usage information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/plugins/pypi/).
 
 ## Build
 
