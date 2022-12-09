@@ -1,291 +1,223 @@
 ---
 kind: pipeline
 name: testing
+type: vm
 
 platform:
   os: linux
   arch: amd64
 
-steps:
-- name: vet
-  pull: always
-  image: golang:1.11
-  commands:
-  - go vet ./...
-  environment:
-    GO111MODULE: on
+pool:
+  use: ubuntu
 
-- name: test
-  pull: always
-  image: golang:1.11-alpine
-  commands:
-  - apk --no-cache add -U python3 python3-dev git gcc libc-dev libffi-dev openssl-dev
-  - pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
-  - go test -cover ./...
-  environment:
-    GO111MODULE: on
-    PLUGIN_DISTRIBUTIONS: sdist
-    PLUGIN_PASSWORD: demo
-    PLUGIN_REPOSITORY: http://pypiserver:8080/
-    PLUGIN_USERNAME: demo
+steps:
+  - name: vet
+    pull: always
+    image: golang:1.19
+    commands:
+      - go vet ./...
+    environment:
+      GO111MODULE: on
+
+  - name: test
+    pull: always
+    image: golang:1.19-alpine
+    commands:
+      - apk --no-cache add -U python3 python3-dev git gcc libc-dev libffi-dev openssl-dev py3-pip
+      - pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
+      - go test -cover ./...
+    environment:
+      GO111MODULE: on
+      PLUGIN_DISTRIBUTIONS: sdist
+      PLUGIN_PASSWORD: demo
+      PLUGIN_REPOSITORY: http://pypiserver:8080/
+      PLUGIN_USERNAME: demo
 
 services:
-- name: pypiserver
-  pull: always
-  image: pypiserver/pypiserver
-  entrypoint:
-  - pypi-server
-  - -P
-  - .
-  - -a
-  - .
-  - -p
-  - 8080
-  - /data/packages
+  - name: pypiserver
+    pull: always
+    image: pypiserver/pypiserver
+    entrypoint:
+      - pypi-server
+      - -P
+      - .
+      - -a
+      - .
+      - -p
+      - 8080
+      - /data/packages
 
 trigger:
   branch:
-  - master
+    - master
 
 ---
 kind: pipeline
 name: linux-amd64
+type: vm
 
 platform:
   os: linux
   arch: amd64
 
+pool:
+  use: ubuntu
+
 steps:
-- name: build-push
-  pull: always
-  image: golang:1.11
-  commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-pypi"
-  environment:
-    CGO_ENABLED: 0
-    GO111MODULE: on
-  when:
-    event:
-    - push
-    - pull_request
+  - name: build-push
+    pull: always
+    image: golang:1.19
+    commands:
+      - 'go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi'
+    environment:
+      CGO_ENABLED: 0
+      GO111MODULE: on
+    when:
+      event:
+        - push
+        - pull_request
 
-- name: build-tag
-  pull: always
-  image: golang:1.11
-  commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-pypi"
-  environment:
-    CGO_ENABLED: 0
-    GO111MODULE: on
-  when:
-    event:
-    - tag
+  - name: build-tag
+    pull: always
+    image: golang:1.19
+    commands:
+      - 'go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi'
+    environment:
+      CGO_ENABLED: 0
+      GO111MODULE: on
+    when:
+      event:
+        - tag
 
-- name: executable
-  pull: always
-  image: golang:1.11
-  commands:
-  - ./release/linux/amd64/drone-pypi --help
+  - name: executable
+    pull: always
+    image: golang:1.19
+    commands:
+      - ./release/linux/amd64/drone-pypi --help
 
-- name: dryrun
-  pull: always
-  image: plugins/docker:linux-amd64
-  settings:
-    dockerfile: docker/Dockerfile.linux.amd64
-    dry_run: true
-    password:
-      from_secret: docker_password
-    repo: plugins/pypi
-    tags: linux-amd64
-    username:
-      from_secret: docker_username
-  when:
-    event:
-    - pull_request
+  - name: dryrun
+    pull: always
+    image: plugins/docker:linux-amd64
+    settings:
+      dockerfile: docker/Dockerfile.linux.amd64
+      dry_run: true
+      password:
+        from_secret: docker_password
+      repo: plugins/pypi
+      tags: linux-amd64
+      username:
+        from_secret: docker_username
+    when:
+      event:
+        - pull_request
 
-- name: publish
-  pull: always
-  image: plugins/docker:linux-amd64
-  settings:
-    auto_tag: true
-    auto_tag_suffix: linux-amd64
-    dockerfile: docker/Dockerfile.linux.amd64
-    password:
-      from_secret: docker_password
-    repo: plugins/pypi
-    username:
-      from_secret: docker_username
-  when:
-    event:
-    - push
-    - tag
+  - name: publish
+    pull: always
+    image: plugins/docker:linux-amd64
+    settings:
+      auto_tag: true
+      auto_tag_suffix: linux-amd64
+      dockerfile: docker/Dockerfile.linux.amd64
+      password:
+        from_secret: docker_password
+      repo: plugins/pypi
+      username:
+        from_secret: docker_username
+    when:
+      event:
+        - push
+        - tag
 
 trigger:
   branch:
-  - master
+    - master
 
 depends_on:
-- testing
+  - testing
 
 ---
 kind: pipeline
 name: linux-arm64
+type: vm
+
+pool:
+  use: ubuntu_arm64
 
 platform:
   os: linux
   arch: arm64
 
 steps:
-- name: build-push
-  pull: always
-  image: golang:1.11
-  commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-pypi"
-  environment:
-    CGO_ENABLED: 0
-    GO111MODULE: on
-  when:
-    event:
-    - push
-    - pull_request
+  - name: build-push
+    pull: always
+    image: golang:1.19
+    commands:
+      - 'go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi'
+    environment:
+      CGO_ENABLED: 0
+      GO111MODULE: on
+    when:
+      event:
+        - push
+        - pull_request
 
-- name: build-tag
-  pull: always
-  image: golang:1.11
-  commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-pypi"
-  environment:
-    CGO_ENABLED: 0
-    GO111MODULE: on
-  when:
-    event:
-    - tag
+  - name: build-tag
+    pull: always
+    image: golang:1.19
+    commands:
+      - 'go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi'
+    environment:
+      CGO_ENABLED: 0
+      GO111MODULE: on
+    when:
+      event:
+        - tag
 
-- name: executable
-  pull: always
-  image: golang:1.11
-  commands:
-  - ./release/linux/arm64/drone-pypi --help
+  - name: executable
+    pull: always
+    image: golang:1.19
+    commands:
+      - ./release/linux/arm64/drone-pypi --help
 
-- name: dryrun
-  pull: always
-  image: plugins/docker:linux-arm64
-  settings:
-    dockerfile: docker/Dockerfile.linux.arm64
-    dry_run: true
-    password:
-      from_secret: docker_password
-    repo: plugins/pypi
-    tags: linux-arm64
-    username:
-      from_secret: docker_username
-  when:
-    event:
-    - pull_request
+  - name: dryrun
+    pull: always
+    image: plugins/docker:linux-arm64
+    settings:
+      dockerfile: docker/Dockerfile.linux.arm64
+      dry_run: true
+      password:
+        from_secret: docker_password
+      repo: plugins/pypi
+      tags: linux-arm64
+      username:
+        from_secret: docker_username
+    when:
+      event:
+        - pull_request
 
-- name: publish
-  pull: always
-  image: plugins/docker:linux-arm64
-  settings:
-    auto_tag: true
-    auto_tag_suffix: linux-arm64
-    dockerfile: docker/Dockerfile.linux.arm64
-    password:
-      from_secret: docker_password
-    repo: plugins/pypi
-    username:
-      from_secret: docker_username
-  when:
-    event:
-    - push
-    - tag
-
-trigger:
-  branch:
-  - master
-
-depends_on:
-- testing
-
----
-kind: pipeline
-name: linux-arm
-
-platform:
-  os: linux
-  arch: arm
-
-steps:
-- name: build-push
-  pull: always
-  image: golang:1.11
-  commands:
-  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-pypi"
-  environment:
-    CGO_ENABLED: 0
-    GO111MODULE: on
-  when:
-    event:
-    - push
-    - pull_request
-
-- name: build-tag
-  pull: always
-  image: golang:1.11
-  commands:
-  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-pypi"
-  environment:
-    CGO_ENABLED: 0
-    GO111MODULE: on
-  when:
-    event:
-    - tag
-
-- name: executable
-  pull: always
-  image: golang:1.11
-  commands:
-  - ./release/linux/arm/drone-pypi --help
-
-- name: dryrun
-  pull: always
-  image: plugins/docker:linux-arm
-  settings:
-    dockerfile: docker/Dockerfile.linux.arm
-    dry_run: true
-    password:
-      from_secret: docker_password
-    repo: plugins/pypi
-    tags: linux-arm
-    username:
-      from_secret: docker_username
-  when:
-    event:
-    - pull_request
-
-- name: publish
-  pull: always
-  image: plugins/docker:linux-arm
-  settings:
-    auto_tag: true
-    auto_tag_suffix: linux-arm
-    dockerfile: docker/Dockerfile.linux.arm
-    password:
-      from_secret: docker_password
-    repo: plugins/pypi
-    username:
-      from_secret: docker_username
-  when:
-    event:
-    - push
-    - tag
+  - name: publish
+    pull: always
+    image: plugins/docker:linux-arm64
+    settings:
+      auto_tag: true
+      auto_tag_suffix: linux-arm64
+      dockerfile: docker/Dockerfile.linux.arm64
+      password:
+        from_secret: docker_password
+      repo: plugins/pypi
+      username:
+        from_secret: docker_username
+    when:
+      event:
+        - push
+        - tag
 
 trigger:
   branch:
-  - master
+    - master
 
 depends_on:
-- testing
+  - testing
 
 ---
 kind: pipeline
@@ -296,34 +228,24 @@ platform:
   arch: amd64
 
 steps:
-- name: manifest
-  pull: always
-  image: plugins/manifest:1
-  settings:
-    ignore_missing: true
-    password:
-      from_secret: docker_password
-    spec: docker/manifest.tmpl
-    username:
-      from_secret: docker_username
-
-- name: microbadger
-  pull: always
-  image: plugins/webhook:1
-  settings:
-    url:
-      from_secret: microbadger_url
+  - name: manifest
+    pull: always
+    image: plugins/manifest
+    settings:
+      ignore_missing: true
+      password:
+        from_secret: docker_password
+      spec: docker/manifest.tmpl
+      username:
+        from_secret: docker_username
 
 trigger:
   branch:
-  - master
+    - master
   event:
-  - push
-  - tag
+    - push
+    - tag
 
 depends_on:
-- linux-amd64
-- linux-arm64
-- linux-arm
-
-...
+  - linux-amd64
+  - linux-arm64
