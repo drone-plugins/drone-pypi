@@ -222,10 +222,14 @@ depends_on:
 ---
 kind: pipeline
 name: notifications
+type: vm
 
 platform:
   os: linux
   arch: amd64
+
+pool:
+  use: ubuntu
 
 steps:
   - name: manifest
