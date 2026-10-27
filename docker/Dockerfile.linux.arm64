@@ -1,14 +1,16 @@
-FROM plugins/base:linux-arm64
+FROM alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+
+ENV GODEBUG=netdns=go
 
 LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" \
   org.label-schema.name="Drone PyPi" \
   org.label-schema.vendor="Drone.IO Community" \
   org.label-schema.schema-version="1.0"
 
-RUN apk add -U ca-certificates python3 py3-pip \
+RUN apk add -U 'ca-certificates>=20261020-r0' mailcap python3 py3-pip \
     python3-dev gcc libc-dev libffi-dev openssl-dev git && \
     rm -rf /var/cache/apk/* && \
-    pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
+    pip3 install --break-system-packages --no-cache-dir --upgrade 'pip==26.2.2' 'certifi==2026.10.19' setuptools wheel six twine
 
 ADD release/linux/arm64/drone-pypi /bin/
 ENTRYPOINT ["/bin/drone-pypi"]

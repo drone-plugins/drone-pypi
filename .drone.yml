@@ -13,7 +13,7 @@ pool:
 steps:
   - name: vet
     pull: always
-    image: golang:1.19
+    image: golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af
     commands:
       - go vet ./...
     environment:
@@ -21,10 +21,12 @@ steps:
 
   - name: test
     pull: always
-    image: golang:1.19-alpine
+    image: golang:1.26.10-alpine@sha256:27f2d3b83cfc5803c8078f8e730af0f7c431bf067afaec8f60a36fb763187cba
     commands:
-      - apk --no-cache add -U python3 python3-dev git gcc libc-dev libffi-dev openssl-dev py3-pip
-      - pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
+      - apk --no-cache add -U 'ca-certificates>=20261020-r0' python3 python3-dev git gcc libc-dev libffi-dev openssl-dev py3-pip
+      - python3 -m venv /tmp/pypi-test-env
+      - . /tmp/pypi-test-env/bin/activate
+      - pip3 install --no-cache-dir --upgrade 'pip>=26.2.2' 'certifi>=2026.10.19' setuptools wheel six twine
       - go test -cover ./...
     environment:
       GO111MODULE: on
@@ -66,7 +68,7 @@ pool:
 steps:
   - name: build-push
     pull: always
-    image: golang:1.19
+    image: golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af
     commands:
       - 'go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi'
     environment:
@@ -79,7 +81,7 @@ steps:
 
   - name: build-tag
     pull: always
-    image: golang:1.19
+    image: golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af
     commands:
       - 'go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-pypi'
     environment:
@@ -91,7 +93,7 @@ steps:
 
   - name: executable
     pull: always
-    image: golang:1.19
+    image: golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af
     commands:
       - ./release/linux/amd64/drone-pypi --help
 
@@ -150,7 +152,7 @@ platform:
 steps:
   - name: build-push
     pull: always
-    image: golang:1.19
+    image: golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af
     commands:
       - 'go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi'
     environment:
@@ -163,7 +165,7 @@ steps:
 
   - name: build-tag
     pull: always
-    image: golang:1.19
+    image: golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af
     commands:
       - 'go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-pypi'
     environment:
@@ -175,7 +177,7 @@ steps:
 
   - name: executable
     pull: always
-    image: golang:1.19
+    image: golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af
     commands:
       - ./release/linux/arm64/drone-pypi --help
 
